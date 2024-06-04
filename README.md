@@ -208,3 +208,33 @@ public class OpenTelemetryConfiguration {
     }
 }
 ```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.3.0</version> <!-- Use the latest version available -->
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>org.example.OpenTelemetryConfiguration</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+                <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>make-assembly</id> <!-- This can be any name -->
+                    <phase>package</phase> <!-- Bind to the packaging phase -->
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
