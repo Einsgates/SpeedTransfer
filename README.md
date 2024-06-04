@@ -137,3 +137,74 @@ public class TelemetryGenerator {
     }
 }
 ```
+### OpenTelemetryConfiguration
+```java
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+
+public class OpenTelemetryConfiguration {
+
+    public static void initializeOpenTelemetry() {
+        System.out.println("Initializing OpenTelemetry...");
+
+        // Configure the OTLP exporter
+        OtlpGrpcSpanExporter spanExporter = OtlpGrpcSpanExporter.builder()
+                .setEndpoint("http://10.212.35.27:4317")
+                .build();
+        System.out.println("OTLP Exporter configured with endpoint: http://10.212.35.27:4317");
+
+        // Configure the SDK tracer provider with a batch span processor
+        SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
+                .addSpanProcessor(BatchSpanProcessor.builder(spanExporter).build())
+                .build();
+        System.out.println("SDK Tracer Provider configured with BatchSpanProcessor");
+
+        // Set the global OpenTelemetry instance
+        OpenTelemetrySdk.builder()
+                .setTracerProvider(tracerProvider)
+                .buildAndRegisterGlobal();
+        System.out.println("Global OpenTelemetry configured.");
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Application started.");
+        initializeOpenTelemetry();
+        Tracer tracer = GlobalOpenTelemetry.getTracer("exampleTracer");
+
+        // Start a span
+        System.out.println("Starting span...");
+        Span span = tracer.spanBuilder("exampleSpan")
+                .setSpanKind(Span.Kind.INTERNAL)
+                .startSpan();
+        System.out.println("Span 'exampleSpan' started.");
+
+        // Add attributes
+        span.setAttribute("exampleKey", "exampleValue");
+        System.out.println("Attribute 'exampleKey' added to span.");
+
+        // Add events
+        span.addEvent("Event 0");
+        System.out.println("Event 0 added to span.");
+        try {
+            // Simulate work
+            Thread.sleep(1000);
+            span.addEvent("Event 1");
+            System.out.println("Event 1 added after 1 second.");
+        } catch (InterruptedException e) {
+            span.setStatus(io.opentelemetry.api.trace.StatusCode.ERROR, "Interrupted!");
+            Thread.currentThread().interrupt();
+            System.out.println("Span interrupted and error status set.");
+        } finally {
+            // End the span
+            span.end();
+            System.out.println("Span ended.");
+        }
+        System.out.println("Application ended.");
+    }
+}
+```
