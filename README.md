@@ -1,5 +1,6 @@
 # SpeedTransfer
 
+```json
 receivers:
   otlp:
     protocols:
@@ -30,3 +31,5 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp]
+
+```
