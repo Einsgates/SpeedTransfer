@@ -55,3 +55,85 @@ service:
 </build>
 
 ```
+
+```xml
+<dependencies>
+    <!-- OpenTelemetry API -->
+    <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-api</artifactId>
+        <version>1.15.0</version>
+    </dependency>
+
+    <!-- OpenTelemetry SDK -->
+    <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-sdk</artifactId>
+        <version>1.15.0</version>
+    </dependency>
+
+    <!-- OpenTelemetry OTLP Exporter -->
+    <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-exporter-otlp</artifactId>
+        <version>1.15.0</version>
+    </dependency>
+
+    <!-- Required for OTLP -->
+    <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-netty-shaded</artifactId>
+        <version>1.42.1</version>
+    </dependency>
+</dependencies>
+```
+
+```java
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
+
+public class TelemetryGenerator {
+
+    private static final Tracer tracer = setupOpenTelemetry().getTracer("io.example.TelemetryGenerator");
+
+    public static void main(String[] args) {
+        Span span = tracer.spanBuilder("start-example-span").startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            simulateWork();
+        } finally {
+            span.end();
+        }
+    }
+
+    private static OpenTelemetry setupOpenTelemetry() {
+        OtlpGrpcSpanExporter spanExporter = OtlpGrpcSpanExporter.builder()
+            .setEndpoint("http://localhost:4317") // Change this to your Collector endpoint
+            .build();
+
+        BatchSpanProcessor spanProcessor = BatchSpanProcessor.builder(spanExporter)
+            .build();
+
+        SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
+            .addSpanProcessor(spanProcessor)
+            .build();
+
+        return OpenTelemetrySdk.builder()
+            .setTracerProvider(tracerProvider)
+            .build();
+    }
+
+    private static void simulateWork() {
+        try {
+            Thread.sleep(1000); // Simulate some work being done
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}
+```
