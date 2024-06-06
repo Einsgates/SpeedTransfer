@@ -35,24 +35,13 @@ service:
 ```
 
 ```xml
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <version>3.2.0</version> <!-- Use the latest version available -->
-            <configuration>
-                <archive>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                        <classpathPrefix>libs/</classpathPrefix> <!-- Only necessary if you have external JARs in a lib folder -->
-                        <mainClass>fully.qualified.MainClass</mainClass> <!-- Replace with your main class -->
-                    </manifest>
-                </archive>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
+my_project/
+├── person.proto
+├── src/
+│   └── main/
+│       └── java/
+└── bin/
+    └── protoc
 
 ```
 
@@ -238,10 +227,4 @@ public class OpenTelemetryConfiguration {
     </plugins>
 </build>
 ```
-my_project/
-├── person.proto
-├── src/
-│   └── main/
-│       └── java/
-└── bin/
-    └── protoc
+
