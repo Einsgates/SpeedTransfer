@@ -238,3 +238,10 @@ public class OpenTelemetryConfiguration {
     </plugins>
 </build>
 ```
+my_project/
+├── person.proto
+├── src/
+│   └── main/
+│       └── java/
+└── bin/
+    └── protoc
