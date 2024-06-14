@@ -160,3 +160,40 @@ public class GrpcClient {
 
 This setup allows you to send gRPC requests from your Java Maven project. If you have any specific questions or need further customization, feel free to ask!
 
+
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.stub.StreamObserver;
+
+import java.io.IOException;
+
+public class GrpcServer {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        // Create a new server to listen on port 50051
+        Server server = ServerBuilder.forPort(50051)
+                .addService(new MyServiceImpl())
+                .build();
+
+        // Start the server
+        server.start();
+        System.out.println("Server started, listening on " + server.getPort());
+
+        // Await termination on the main thread
+        server.awaitTermination();
+    }
+
+    // Implement the service defined in the .proto file
+    static class MyServiceImpl extends MyServiceGrpc.MyServiceImplBase {
+        @Override
+        public void sayHello(HelloRequest request, StreamObserver<HelloResponse> responseObserver) {
+            // Create a response
+            HelloResponse response = HelloResponse.newBuilder()
+                    .setMessage("Hello, " + request.getName())
+                    .build();
+
+            // Send the response back to the client
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
+    }
+}
