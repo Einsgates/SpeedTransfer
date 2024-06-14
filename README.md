@@ -1,37 +1,43 @@
 
 # SpeedTransfer
 
-```xml
-<build>
-    <extensions>
-        <extension>
-            <groupId>kr.motd.maven</groupId>
-            <artifactId>os-maven-plugin</artifactId>
-            <version>1.6.2</version>
-        </extension>
-    </extensions>
-    <plugins>
-        <plugin>
-            <groupId>org.xolstice.maven.plugins</groupId>
-            <artifactId>protobuf-maven-plugin</artifactId>
-            <version>0.6.1</version>
-            <configuration>
-                <protocArtifact>com.google.protobuf:protoc:3.21.1:exe:${os.detected.classifier}</protocArtifact>
-                <pluginId>grpc-java</pluginId>
-                <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.45.1:exe:${os.detected.classifier}</pluginArtifact>
-                <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
-            </configuration>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>compile</goal>
-                        <goal>compile-custom</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
-</build>
+```java
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.stub.StreamObserver;
+
+import java.io.IOException;
+
+public class GrpcServer {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        // Create a new server to listen on port 50051
+        Server server = ServerBuilder.forPort(50051)
+                .addService(new MyServiceImpl())
+                .build();
+
+        // Start the server
+        server.start();
+        System.out.println("Server started, listening on " + server.getPort());
+
+        // Await termination on the main thread
+        server.awaitTermination();
+    }
+
+    // Implement the service defined in the .proto file
+    static class MyServiceImpl extends MyServiceGrpc.MyServiceImplBase {
+        @Override
+        public void sayHello(HelloRequest request, StreamObserver<HelloResponse> responseObserver) {
+            // Create a response
+            HelloResponse response = HelloResponse.newBuilder()
+                    .setMessage("Hello, " + request.getName())
+                    .build();
+
+            // Send the response back to the client
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        }
+    }
+}
 ```
 To send gRPC requests from a Java Maven project, you will need to include the necessary dependencies and write the client code. Here's a step-by-step guide to help you set this up.
 
