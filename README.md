@@ -2,16 +2,26 @@
 
 ```xml
 <dependencies>
+    <!-- gRPC dependencies -->
     <dependency>
-        <groupId>org.openjdk.jmh</groupId>
-        <artifactId>jmh-core</artifactId>
-        <version>1.35</version> <!-- Use the latest version available -->
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-netty</artifactId>
+        <version>1.45.1</version>
     </dependency>
     <dependency>
-        <groupId>org.openjdk.jmh</groupId>
-        <artifactId>jmh-generator-annprocess</artifactId>
-        <version>1.35</version> <!-- Use the latest version available -->
-        <scope>provided</scope>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-protobuf</artifactId>
+        <version>1.45.1</version>
+    </dependency>
+    <dependency>
+        <groupId>io.grpc</groupId>
+        <artifactId>grpc-stub</artifactId>
+        <version>1.45.1</version>
+    </dependency>
+    <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>3.21.1</version>
     </dependency>
 </dependencies>
 ```
