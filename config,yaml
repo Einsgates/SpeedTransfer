@@ -1,0 +1,38 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 10s
+    send_batch_size: 1024
+
+exporters:
+  alloy:
+    endpoint: "alloy-endpoint:4317"
+    tls:
+      insecure: true # or configure proper TLS settings if needed
+
+  tempo:
+    endpoint: "tempo-endpoint:4317"
+    tls:
+      insecure: true # or configure proper TLS settings if needed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [alloy, tempo]
+
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [alloy, tempo]
+
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [alloy, tempo]
